@@ -39,6 +39,7 @@ runs:
       shell: bash
       run: |
         touch $INPUT_asdf_tool_versions_file
+        echo 'NODEJS_VERSION=undefined' >> $GITHUB_OUTPUT
         cat $INPUT_asdf_tool_versions_file | awk '{printf "%s_VERSION=%s \n",toupper($1),$2 }' >> $GITHUB_OUTPUT
     - name: "asdf-plugin (golang)"
       if: "${{ steps.setupenv.outputs.GOLANG_VERSION != '' }}"
