@@ -25,7 +25,8 @@ runs:
       shell: bash
     - name: Setup ASDF environment
       id: asdf
-      uses: agilesyndrome/github-actions/asdf@main
+      uses: agilesyndrome/github-actions/asdf@80810e2d39868e9f44bb5f33e5a1e087168c2875
+
       with:
         asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
         action_version: ${{ inputs.action_version }}
