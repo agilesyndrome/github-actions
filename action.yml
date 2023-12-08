@@ -32,10 +32,8 @@ runs:
     - name: Setup ASDF environment
       id: asdf
       uses: agilesyndrome/github-actions/asdf@main
-
       with:
         asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
-        action_version: ${{ inputs.action_version }}
     - name: make {{ inputs.makefile_target }}
       if: "${{ inputs.makefile_target != '' }}"
       run: "make ${{ inputs.makefile_target }}"
