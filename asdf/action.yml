@@ -47,7 +47,7 @@ runs:
         go-version: ${{ steps.setupenv.outputs.GOLANG_VERSION }}
     - name: "asdf-plugin (goreleaser)"
       if: "${{ steps.setupenv.outputs.GORELEASER_VERSION != '' }}"
-      uses: goreleaser-action@v5
+      uses: goreleaser/goreleaser-action@v5
       with:
         distribution: goreleaser
         version: ${{ steps.setupenv.outputs.GORELEASER_VERSION}}
