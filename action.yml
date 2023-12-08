@@ -30,11 +30,11 @@ runs:
         asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
         action_version: ${{ inputs.action_version }}
     - name: make {{ inputs.makefile_target }}
-      if: "${{ inputs.makefile_target != '' }}"
-      run: "make ${{ inputs.makefile_target }}"
+      if: "${{ github.events.inputs.makefile_target != '' }}"
+      run: "make ${{ github.events.inputs.makefile_target }}"
       shell: bash
 
-    - name: Gorelease
+    - name: Run Gorelease
       if: "${{ steps.asdf.outputs.GORELEASER_VERSION != '' }}"
-      uses: agilesyndrome/github-actions/goreleaser-gpg@${{ inputs.action_version}}
+      uses: agilesyndrome/github-actions/goreleaser-gpg@${{ github.events.inputs.action_version}}
 
