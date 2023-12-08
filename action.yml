@@ -39,11 +39,3 @@ runs:
       run: "make ${{ inputs.makefile_target }}"
       shell: bash
 
-    - name: Run Gorelease
-      if: "${{ steps.asdf.outputs.GORELEASER_VERSION != '' }}"
-      uses: agilesyndrome/github-actions/goreleaser-gpg@main
-      with:
-        github_token: ${{ inputs.github_token }}
-        gpg_private_key: ${{ inputs.gpg_private_key }}
-        gpg_passphrase: ${{ inputs.gpg_passphrase }}
-
