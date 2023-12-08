@@ -8,7 +8,7 @@ inputs:
     description: 'Goreleaser version'
     required: true
   goreleaser_distribution:
-    description: "goreleaser (*default) or goreleaser-pro"
+    description: "goreleaser (*default) or goreleaser-pro" # todo! support pro
     default: goreleaser
   gpg_private_key:
     description: "GPG Private Key"

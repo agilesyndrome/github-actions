@@ -9,7 +9,7 @@ inputs:
     default: ".tool-versions"
   action_version:
     description: "AgileSyndrome github-actions version to pin to"
-    default: main
+    default: "main"
   makefile_target:
     description: "Make target to run"
     default: ""
@@ -20,21 +20,21 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v4.1.1
     - name: Unshallow
-      if: "${{ github.events.inputs.unshallow == '1' }}"
+      if: "${{ inputs.unshallow == '1' }}"
       run: git fetch --prune --unshallow
       shell: bash
     - name: Setup ASDF environment
       id: asdf
-      uses: agilesyndrome/github-actions/asdf@${{ github.events.inputs.action_version}}
+      uses: agilesyndrome/github-actions/asdf@main
       with:
-        asdf_tool_versions_file: ${{ github.events.inputs.asdf_tool_versions_file }}
-        action_version: ${{ github.events.inputs.action_version }}
-    - name: make {{ github.events.inputs.makefile_target }}
-      if: "${{ github.events.inputs.makefile_target != '' }}"
-      run: "make ${{ github.events.inputs.makefile_target }}"
+        asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
+        action_version: ${{ inputs.action_version }}
+    - name: make {{ inputs.makefile_target }}
+      if: "${{ inputs.makefile_target != '' }}"
+      run: "make ${{ inputs.makefile_target }}"
       shell: bash
 
     - name: Run Gorelease
       if: "${{ steps.asdf.outputs.GORELEASER_VERSION != '' }}"
-      uses: agilesyndrome/github-actions/goreleaser-gpg@${{ github.events.inputs.action_version}}
+      uses: agilesyndrome/github-actions/goreleaser-gpg@main
 
