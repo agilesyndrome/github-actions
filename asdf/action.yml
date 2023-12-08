@@ -44,7 +44,7 @@ runs:
         cat ${ASDF_TOOL_VERSIONS_FILE} | awk '{printf "%s_VERSION=%s \n",toupper($1),$2 }' >> $GITHUB_OUTPUT
     - name: "asdf-plugin (golang)"
       if: "${{ steps.setupenv.outputs.GOLANG_VERSION != '' }}"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v5
       with:
         go-version: "${{ steps.setupenv.outputs.GOLANG_VERSION }}"
     - name: "asdf-plugin (goreleaser)"
