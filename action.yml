@@ -1,0 +1,40 @@
+name: Run some basic tasks for all environments
+description: An opinionated way to get Github actions setup and running
+inputs:
+  unshallow:
+    description: "Run `git fetch --prune --unshallow` ?"
+    default: '1'
+  asdf_tool_versions_file:
+    description: "Path to the asdf tool-versions file"
+    default: ".tool-versions"
+  action_version:
+    description: "AgileSyndrome github-actions version to pin to"
+    default: main
+  makefile_target:
+    description: "Make target to run"
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.1
+    - name: Unshallow
+      if: "${{ inputs.unshallow == '1' }}"
+      run: git fetch --prune --unshallow
+      shell: bash
+    - name: Setup ASDF environment
+      id: asdf
+      uses: agilesyndrome/github-actions/asdf@${{ inputs.action_version}}
+      with:
+        asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
+        action_version: ${{ inputs.action_version }}
+    - name: make {{ inputs.makefile_target }}
+      if: "${{ inputs.makefile_target != '' }}"
+      run: "make ${{ inputs.makefile_target }}"
+      shell: bash
+
+    - name: Gorelease
+      if: "${{ steps.asdf.outputs.GORELEASER_VERSION != '' }}"
+      uses: agilesyndrome/github-actions/goreleaser-gpg@${{ inputs.action_version}}
+

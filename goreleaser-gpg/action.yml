@@ -1,0 +1,41 @@
+name: Run Goreleaser with imported GPG Key
+description: Run Goreleaser
+inputs:
+  goreleaser_action:
+    description: 'Github GoRelease Action'
+    default: goreleaser-action@v5
+  goreleaser_version:
+    description: 'Goreleaser version'
+    required: true
+  goreleaser_distribution:
+    description: "goreleaser (*default) or goreleaser-pro"
+    default: goreleaser
+  gpg_private_key:
+    description: "GPG Private Key"
+    default: "${{ secrets.GPG_PRIVATE_KEY }}"
+  gpg_private_key_passphrase:
+    description: "Passphrase for GPG Private Key"
+    default: "${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}"
+  args:
+    description: 'Args to pass to goreleaser (*default: release --clean)'
+    default: 'release --clean'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Import GPG key
+      id: import_gpg
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ inputs.gpg_private_key }}
+        passphrase: ${{ inputs.gpg_private_key_passphrase}}
+    - name: Run GoReleaser
+      uses: ${{ inputs.goreleaser_action}}
+      with:
+        distribution: ${{ inputs.goreleaser_distribution }}
+        version: ${{ inputs.goreleaser_version}}
+        args: ${{ inputs.args }}
+      env:
+        GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+        # GitHub sets this automatically
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
