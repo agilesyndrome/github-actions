@@ -39,7 +39,6 @@ runs:
       shell: bash
       run: |
         touch $INPUT_asdf_tool_versions_file
-        echo 'NODEJS_VERSION=undefined' >> $GITHUB_OUTPUT
         cat $INPUT_asdf_tool_versions_file | awk '{printf "%s_VERSION=%s \n",toupper($1),$2 }' >> $GITHUB_OUTPUT
     - name: "asdf-plugin (golang)"
       if: "${{ steps.setupenv.outputs.GOLANG_VERSION != '' }}"
@@ -57,8 +56,7 @@ runs:
       if: "${{ steps.setupenv.outputs.NODEJS_VERSION != '' }}"
       uses: actions/setup-node@v4
       with:
-          with:
-            node-version: ${{ steps.setupenv.outputs.NODEJS_VERSION || "undefined" }}
+        node-version: "${{ steps.setupenv.outputs.NODEJS_VERSION }}"
     - name: "asdf-plugin (opentofu)"
       if: "${{ steps.setupenv.outputs.OPENTOFU_VERSION != '' }}"
       uses: opentofu/setup-opentofu@v1
@@ -68,11 +66,9 @@ runs:
       if: "${{ steps.setupenv.outputs.NODEJS_VERSION != '' }}"
       uses: actions/setup-python@v5
       with:
-        with:
-          python-version: "${{ steps.setupenv.outputs.PYTHON_VERSION }}"
+        python-version: "${{ steps.setupenv.outputs.PYTHON_VERSION }}"
     - name: "asdf-plugin (terraform)"
       if: "${{ steps.setupenv.outputs.TERRAFORM_VERSION != '' }}"
       uses: hashicorp/setup-terraform@v3
       with:
-        with:
-          python-version: "${{ steps.setupenv.outputs.TERRAFORM_VERSION }}"
+        python-version: "${{ steps.setupenv.outputs.TERRAFORM_VERSION }}"
