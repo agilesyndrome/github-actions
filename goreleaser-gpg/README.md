@@ -1,5 +1,7 @@
 # GoReleaser
 
+
+
 ## Required Env Vars
 * GPG_PRIVATE_KEY
 * PASSPHRASE

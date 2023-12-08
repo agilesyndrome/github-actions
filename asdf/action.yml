@@ -1,8 +1,5 @@
 # Plugins
 
-# ignore:
-  # goreleaser - (Sets itself up when calling the action)
-
 # todo:
   # nodejs
   # python
@@ -10,13 +7,68 @@
 name: Setup Environment based on ASDF .tool-versions file
 description: Setup Environment based on ASDF .tool-versions
 inputs:
-  action_version:
-    description: "Should we pin the actions to a specific version?"
-    default: main
+  asdf_tool_versions_file:
+    description: "Path to the asdf tool-versions file"
+    default: ".tool-versions"
+
 outputs:
-  GOLANG_VERSION: 'What version of Golang was selected'
+  GOLANG_VERSION:
+    description: 'golang version'
+    value: ${{ steps.setupenv.outputs.GOLANG_VERSION }}
+  GORELEASER_VERSION:
+    description: 'goreleaser version'
+    value: ${{ steps.setupenv.outputs.GORELEASER_VERSION }}
+  NODEJS_VERSION:
+    description: 'nodejs version'
+    value: ${{ steps.setupenv.outputs.NODEJS_VERSION }}
+  OPENTOFU_VERSION:
+    description: 'opentofu version'
+    value: ${{ steps.setupenv.outputs.OPENTOFU_VERSION }}
+  PYTHON_VERSION:
+    description: 'python version'
+    value: ${{ steps.setupenv.outputs.PYTHON_VERSION }}
+  TERRAFORM_VERSION:
+    description: 'terraform version'
+    value: ${{ steps.setupenv.outputs.TERRAFORM_VERSION }}
+
 runs:
   using: "composite"
   steps:
-    - name: Golang
-      uses: "agilesyndrome/github-actions/envgolang@${{ inputs.action_version}}"
+    - name: Setup ASDF environment
+      id: setupenv
+      shell: bash
+      run: |
+        touch $INPUT_asdf_tool_versions_file
+        cat $INPUT_asdf_tool_versions_file | awk '{printf "%s_VERSION=%s \n",toupper($1),$2 }' >> $GITHUB_OUTPUT
+    - name: "asdf-plugin (golang)"
+      if: "${{ steps.setupenv.outputs.GOLANG_VERSION != '' }}"
+      uses: actions/setup-go@v2
+      with:
+        go-version: "${{ steps.setupenv.outputs.GOLANG_VERSION }}"
+    - name: "asdf-plugin (goreleaser)"
+      if: "${{ steps.setupenv.outputs.GORELEASER_VERSION != '' }}"
+      uses: goreleaser/goreleaser-action@v5
+      with:
+        distribution: goreleaser
+        version: "${{ steps.setupenv.outputs.GORELEASER_VERSION }}"
+        install-only: true
+    - name: "asdf-plugin (nodejs)"
+      if: "${{ steps.setupenv.outputs.NODEJS_VERSION != '' }}"
+      uses: actions/setup-node@v4
+      with:
+        node-version: "${{ steps.setupenv.outputs.NODEJS_VERSION }}"
+    - name: "asdf-plugin (opentofu)"
+      if: "${{ steps.setupenv.outputs.OPENTOFU_VERSION != '' }}"
+      uses: opentofu/setup-opentofu@v1
+      with:
+          tofu_version: "${{ steps.setupenv.outputs.OPENTOFU_VERSION }}"
+    - name: "asdf-plugin (python)"
+      if: "${{ steps.setupenv.outputs.NODEJS_VERSION != '' }}"
+      uses: actions/setup-python@v5
+      with:
+        python-version: "${{ steps.setupenv.outputs.PYTHON_VERSION }}"
+    - name: "asdf-plugin (terraform)"
+      if: "${{ steps.setupenv.outputs.TERRAFORM_VERSION != '' }}"
+      uses: hashicorp/setup-terraform@v3
+      with:
+        python-version: "${{ steps.setupenv.outputs.TERRAFORM_VERSION }}"

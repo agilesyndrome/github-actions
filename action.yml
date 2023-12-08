@@ -1,0 +1,51 @@
+name: Run some basic tasks for all environments
+description: An opinionated way to get Github actions setup and running
+inputs:
+  unshallow:
+    description: "Run `git fetch --prune --unshallow` ?"
+    default: '1'
+  asdf_tool_versions_file:
+    description: "Path to the asdf tool-versions file"
+    default: ".tool-versions"
+  makefile_target:
+    description: "Make target to run"
+    default: ""
+  github_token:
+    description: 'Github Token'
+    required: true
+  gpg_private_key:
+    description: 'GPG Private Key'
+    required: true
+  gpg_passphrase:
+    description: 'Passphrase to GPG Private Key'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.1
+    - name: Unshallow
+      if: "${{ inputs.unshallow == '1' }}"
+      run: git fetch --prune --unshallow
+      shell: bash
+    - name: Setup ASDF environment
+      id: asdf
+      uses: agilesyndrome/github-actions/asdf@main
+
+      with:
+        asdf_tool_versions_file: ${{ inputs.asdf_tool_versions_file }}
+        action_version: ${{ inputs.action_version }}
+    - name: make {{ inputs.makefile_target }}
+      if: "${{ inputs.makefile_target != '' }}"
+      run: "make ${{ inputs.makefile_target }}"
+      shell: bash
+
+    - name: Run Gorelease
+      if: "${{ steps.asdf.outputs.GORELEASER_VERSION != '' }}"
+      uses: agilesyndrome/github-actions/goreleaser-gpg@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        gpg_private_key: ${{ inputs.gpg_private_key }}
+        gpg_passphrase: ${{ inputs.gpg_passphrase }}
+
