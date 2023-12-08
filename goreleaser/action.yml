@@ -1,0 +1,44 @@
+name: Goreleaser
+description: Goreleaser
+inputs:
+  version:
+    description: 'What version of Goreleaser should be installed? Leave blank to use asdf .tool-versions.'
+    required: false
+  distribution:
+    default: 'goreleaser' # or goreleaser-pro
+  goreleaser_action:
+    default: 'goreleaser-action@v5.0.0'
+  args:
+    default: 'release --clean'
+
+outputs:
+  GORELEASER_VERSION: 'What version of Golang was selected'
+runs:
+  using: "composite"
+  steps:
+    - name: Import GPG key
+      if: "${{ inputs.import_gpg == '1' }}"
+      id: import_gpg
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+    - name: Setup GoReleaser for CI Environment
+      id: golangenv
+      shell: bash
+      run: |
+        if [ -z "${INPUT_GORELEASER_VERSION}" ]; then
+          echo GORELEASER_VERSION=$(cat .tool-versions| grep '^goreleaser ' | awk '{print $2}') >> $GITHUB_OUTPUT
+        else
+          echo GORELEASER_VERSION=${INPUT_GORELEASER_VERSION}
+        fi
+    - name: Run GoReleaser
+      uses: ${{ inputs.goreleaser_action_version}}
+      with:
+        distribution: ${{ inputs.distribution }}
+        version: ${{ steps.golangenv.outputs.GORELEASER_VERSION}}
+        args: ${{ inputs.args }}
+      env:
+        GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+        # GitHub sets this automatically
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

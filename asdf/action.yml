@@ -1,0 +1,22 @@
+# Plugins
+
+# ignore:
+  # goreleaser - (Sets itself up when calling the action)
+
+# todo:
+  # nodejs
+  # python
+
+name: Setup Environment based on ASDF .tool-versions file
+description: Setup Environment based on ASDF .tool-versions
+inputs:
+  action_version:
+    description: "Should we pin the actions to a specific version?"
+    default: main
+outputs:
+  GOLANG_VERSION: 'What version of Golang was selected'
+runs:
+  using: "composite"
+  steps:
+    - name: Golang
+      uses: "agilesyndrome/github-actions/envgolang@${{ inputs.action_version}}"

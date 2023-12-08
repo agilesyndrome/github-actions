@@ -1,0 +1,23 @@
+name: Setup Golang
+description: Setup Golang
+inputs:
+  version: 'What version of Golang should be installed? Leave blank to use asdf .tool-versions.'
+  required: false
+outputs:
+  GOLANG_VERSION: 'What version of Golang was selected'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Golang for CI Environment
+      id: golangenv
+      shell: bash
+      run: |
+        if [ -z "${INPUT_GOLANG_VERSION}" ]; then
+          echo GOLANG_VERSION=$(cat .tool-versions| grep '^golang ' | awk '{print $2}') >> $GITHUB_OUTPUT
+        else
+          echo GOLANG_VERSION=${INPUT_GOLANG_VERSION}
+        fi
+    - run: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ steps.golangenv.outputs.GOLANG_VERSION }}
