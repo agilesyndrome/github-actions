@@ -30,11 +30,23 @@ runs:
         gpg_private_key: ${{ inputs.gpg_private_key }}
         passphrase: ${{ inputs.gpg_private_key }}
     - name: Run GoReleaser
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
       uses: goreleaser/goreleaser-action@v5
       with:
         distribution: ${{ inputs.goreleaser_distribution }}
         version: ${{ inputs.goreleaser_version }}
         args: ${{ inputs.args }}
+      env:
+        GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+        # GitHub sets this automatically
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+    - name: Run GoReleaser (Snapshot)
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+      uses: goreleaser/goreleaser-action@v5
+      with:
+        distribution: ${{ inputs.goreleaser_distribution }}
+        version: ${{ inputs.goreleaser_version }}
+        args: "${{ inputs.args }} --snapshot"
       env:
         GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
         # GitHub sets this automatically
