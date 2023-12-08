@@ -9,7 +9,7 @@ inputs:
     default: ".tool-versions"
   action_version:
     description: "AgileSyndrome github-actions version to pin to"
-    default: main
+    default: "main"
   makefile_target:
     description: "Make target to run"
     default: ""
