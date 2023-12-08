@@ -57,7 +57,7 @@ runs:
       uses: actions/setup-node@v4
       with:
           with:
-            node-version: "${{ steps.setupenv.outputs.NODEJS_VERSION }}"
+            node-version: ${{ steps.setupenv.outputs.NODEJS_VERSION || "undefined" }}
     - name: "asdf-plugin (opentofu)"
       if: "${{ steps.setupenv.outputs.OPENTOFU_VERSION != '' }}"
       uses: opentofu/setup-opentofu@v1
